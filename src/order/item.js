@@ -10,18 +10,49 @@ import Swipeable from 'react-swipeable'
 //   padding: '3px 10px',
 // }
 
+const cyan600 = '#00acc1'
+const cyan600T = 'rgba(0, 172, 193, 0.9)'
+const red600 = '#e53935'
+
 const orderStyles = {
   display: 'flex',
-  margin: '5px 0',
-  lineHeight: '30px',
+  flexWrap: 'nowrap',
+  // margin: '1px 0',
+  margin: 0,
+  // lineHeight: '40px',
+  lineHeight: '4em',
 }
+
 // & > *
 // width 100%
 
 const infoStyles = {
-  flex: 'auto',
-  margin: '0 5px',
+  // flex: 'auto',
+  padding: '0 5px',
+  transitionDuration: '0.3s',
+  border: '2px solid',
+  borderColor: 'transparent',
   width: '100%',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  display: 'flex',
+}
+
+const titleStyles = {
+  lineHeight: '1em',
+  // display: 'inline-block',
+}
+
+const removingInfoStyles = {
+  borderColor: red600,
+}
+
+const commentingInfoStyles = {
+  borderColor: cyan600,
+  color: 'rgba(0,0,0,0.3)',
+  fontSize: '0.5em',
+  // alignItems: 'flex-start',
+  // '-webkit-filter': 'blur(2px)',
 }
   // .title
   //   text-transform capitalize
@@ -29,12 +60,12 @@ const infoStyles = {
   //   float right
 
 const removeStyles = {
-  flex: '1',
+  // flex: '1',
   width: '100%',
   transitionDuration: '0.3s',
   textAlign: 'center',
-  backgroundColor: 'red',
-  color: 'red',
+  backgroundColor: red600,
+  color: red600,
   cursor: 'pointer',
 }
   // &:active
@@ -43,18 +74,38 @@ const removeStyles = {
   //   flex 1 30px
 
 const commentStyles = {
-  flex: '1 0px',
+  // flex: '1',
   transitionDuration: '0.3s',
-  backgroundColor: 'cyan',
-  width: '200px',
-  padding: '0 10px',
-  overflow: 'hidden',
+  backgroundColor: cyan600,
+  // width: '200px',
+  position: 'relative',
+  padding: '0 0 0 10px',
+  // overflow: 'hidden',
 }
 
 const commentFieldStyles = {
-  opacity: '0',
+  // backgroundColor: cyan600T,
+  backgroundColor: 'transparent',
+  // opacity: '0',
+  color: 'white',
   border: 'none',
-  display: 'inline-block',
+  // display: 'inline-block',
+}
+
+const commentBlockStyles = {
+  position: 'absolute',
+  width: '80vw',
+  height: '100%',
+  backgroundColor: cyan600T,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  left: '-100vw',
+  transitionDuration: '0.3s',
+}
+
+const commentBlockActiveStyles = {
+  left: '0vw',
 }
 // &:hover
 //   flex 1 300px
@@ -62,30 +113,87 @@ const commentFieldStyles = {
 //     opacity 1
 //
 
+const ACTION_DELTA = 100
+
 
 class Item extends React.Component {
   constructor(...args) {
     super(...args)
     this.state = {
       rightPan: 0,
+      leftPan: 0,
+      removing: false,
+      commenting: false,
     }
 
     this.swipingLeft = this.swipingLeft.bind(this)
     this.swipingRight = this.swipingRight.bind(this)
+    this.handleSwipeEnd = this.handleSwipeEnd.bind(this)
+  }
+
+  calcP(delta) {
+    return ACTION_DELTA - Math.max(0, ACTION_DELTA - delta)
   }
 
   swipingLeft(e, rightPan) {
-    console.log('swiping', e, rightPan)
-    this.setState({ rightPan: this.state.rightPan + rightPan })
+    const p = this.calcP(rightPan)
+    const percent = Math.round(p / ACTION_DELTA * 15)
+    // console.log('swiping', p, rightPan, percent)
+    if (this.state.rightPan === percent) return
+
+    this.setState({
+      leftPan: 0,
+      rightPan: percent,
+      removing: ACTION_DELTA === p,
+      commenting: false,
+    })
+    // this.setState({ rightPan: Math.min(150, this.state.rightPan + rightPan) })
   }
 
   swipingRight(e, leftPan) {
-    console.log('swiping', e, leftPan)
-    this.setState({ rightPan: this.state.rightPan - leftPan })
+    if (this.state.commenting) return
+
+    const p = this.calcP(leftPan)
+    const percent = Math.round(p / ACTION_DELTA * 15)
+    // console.log('swiping', e, leftPan)
+    // this.setState({ rightPan: Math.max(20, this.state.rightPan - leftPan) })
+    if (this.state.leftPan === percent) return
+
+    this.setState({
+      leftPan: percent,
+      rightPan: 0,
+      removing: false,
+      commenting: ACTION_DELTA === p,
+    })
+  }
+
+  handleSwipeEnd() {
+    // if (this.state.removing) {
+    //   this.props.remove(this.props.pos)
+    // }
+
+    this.setState({
+      rightPan: 0,
+      // leftPan: this.state.commenting ? this.state.leftPan : 0,
+      leftPan: 0,
+      // commenting: false,
+      removing: false,
+    })
   }
 
   render() {
     const { price, title } = this.props
+    const itemStyles = {
+      ...infoStyles,
+      ...(this.state.removing ? removingInfoStyles : {}),
+      ...(this.state.commenting ? commentingInfoStyles : {}),
+    }
+
+    const commentItemStyles = {
+      ...commentBlockStyles,
+      ...(this.state.commenting ? commentBlockActiveStyles : {}),
+    }
+// style={{ ...commentStyles, flexBasis: `${this.state.leftPan}%` }}
     return (
       <Swipeable
         onSwipingLeft={this.swipingLeft}
@@ -96,21 +204,31 @@ class Item extends React.Component {
         onSwipedUp={this.swipedUp}
         onSwipedRight={this.swipedRight}
         onSwipedDown={this.swipedDown}
-        onSwipedLeft={this.swipedLeft}
-        onSwiped={this.handleSwipeAction}*/
-        preventDefaultTouchmoveEvent={false}
+        onSwipedLeft={this.swipedLeft}*/
+        onSwiped={this.handleSwipeEnd}
+        preventDefaultTouchmoveEvent
       >
         <li className="order" style={orderStyles}>
-          <div className="comment" style={commentStyles}>
-            <input type="text" className="comment-field" style={commentFieldStyles} />
+          <div
+            className="comment"
+            style={{ ...commentStyles, flexBasis: `${'0'}%` }}
+          >
+            <div className="comment-block" style={commentItemStyles}>
+              <input
+                type="text"
+                className="comment-field"
+                style={commentFieldStyles}
+                value={ `comment for ${title}` }
+              />
+            </div>
           </div>
-          <div className="order-info" style={infoStyles}>
-            <span className="title">{title}</span>
-            <span className="price" style={{ float: 'right' }}>{price}</span>
+          <div className="order-info" style={itemStyles}>
+            <span className="title" style={titleStyles}>{title}</span>
+            <span className="price">{price}</span>
           </div>
           <div
             className="remove"
-            style={{ ...removeStyles, flexBasis: `${this.state.rightPan}px` }}
+            style={{ ...removeStyles, flexBasis: `${this.state.rightPan}%` }}
           >x</div>
         </li>
       </Swipeable>
@@ -121,6 +239,8 @@ class Item extends React.Component {
 Item.propTypes = {
   title: React.PropTypes.string,
   price: React.PropTypes.number,
+  pos: React.PropTypes.number,
+  remove: React.PropTypes.function,
 }
 
 export default Item
