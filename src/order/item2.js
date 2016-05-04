@@ -45,7 +45,7 @@ const infoStyles = {
   ...block,
   // flex: 'auto',
   transitionDuration: '0.3s',
-  border: '2px solid',
+  border: '.2em solid',
   borderColor: 'transparent',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -98,9 +98,23 @@ const removeStyles = {
 const commentStyles = {
   // flex: '1',
   ...block,
+  padding: '.5em 1em',
   transitionDuration: '0.3s',
   backgroundColor: cyan600,
   // overflow: 'hidden',
+}
+
+const commentLabelStyles = {
+  // backgroundColor: cyan600T,
+  // backgroundColor: 'transparent',
+  // opacity: '0',
+  color: 'rgba(255,255,255,0.6)',
+  lineHeight: '1.1em',
+  // border: 'none',
+  paddingBottom: '.5em',
+  fontSize: '.8em',
+  width: '100%',
+  // display: 'inline-block',
 }
 
 const commentFieldStyles = {
@@ -109,6 +123,12 @@ const commentFieldStyles = {
   // opacity: '0',
   color: 'white',
   border: 'none',
+  boxSizing: 'border-box',
+  lineHeight: '1.1em',
+  fontSize: 'inherit',
+  width: '100%',
+  wordBreak: 'break-all',
+  textAlign: 'justify',
   // display: 'inline-block',
 }
 
@@ -118,8 +138,9 @@ const commentBlockStyles = {
   height: '100%',
   backgroundColor: cyan600T,
   display: 'flex',
+  flexDirection: 'column',
   alignItems: 'center',
-  justifyContent: 'center',
+  justifyContent: 'space-around',
   // left: '-100vw',
   transitionDuration: '0.3s',
 }
@@ -164,6 +185,10 @@ class Item extends React.Component {
     // console.log('swiping', p, this.state.rightPan, rightPan, percent)
     if (this.state.rightPan === percent) return
 
+    if (this.state.commenting) {
+      this.refs.comment.blur()
+    }
+
     this.setState({
       leftPan: 0,
       rightPan: percent,
@@ -194,6 +219,10 @@ class Item extends React.Component {
   handleSwipeEnd() {
     if (this.state.removing && !this.state.wasActive) {
       this.props.remove(this.props.pos)
+    }
+
+    if (this.state.commenting) {
+      this.refs.comment.focus()
     }
 
     this.setState({
@@ -247,12 +276,15 @@ class Item extends React.Component {
           style={commentStyles}
         >
           <div className="comment-block" style={commentItemStyles}>
-            <input
-              type="text"
+            <small style={commentLabelStyles}>comment</small>
+            <div
+              ref="comment"
+              contentEditable
               className="comment-field"
               style={commentFieldStyles}
-              value={ `comment for ${title}` }
-            />
+            >
+            {`${title} ${title} ${title}`}
+            </div>
           </div>
         </div>
         <div className="order-info" style={itemStyles}>

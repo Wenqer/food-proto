@@ -39,6 +39,7 @@ const containerStyles = {
   padding: 0,
   display: 'block',
   fontSize: '90%',
+  fontFamily: 'Lato, Helvetica, Arial, sans-serif',
   // width: '400px',
   width: '100vw',
 }
