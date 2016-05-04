@@ -16,7 +16,7 @@ const red600 = '#e53935'
 const base = 4
 const basis = 100 / base
 const blockSize = basis - 2
-const removeSize = blockSize / 3
+const removeSize = blockSize / 5
 
 const orderStyles = {
   display: 'flex',
@@ -70,9 +70,9 @@ const removingInfoStyles = {
 }
 
 const commentingInfoStyles = {
-  borderColor: cyan600,
-  color: 'rgba(0,0,0,0.3)',
-  fontSize: '0.5em',
+  // borderColor: cyan600,
+  color: 'rgba(0,0,0,0)',
+  // fontSize: '0.5em',
   // alignItems: 'flex-start',
   // '-webkit-filter': 'blur(2px)',
 }
@@ -144,6 +144,7 @@ class Item extends React.Component {
       leftPan: 0,
       removing: false,
       commenting: false,
+      wasActive: false,
     }
 
     this.swipingLeft = this.swipingLeft.bind(this)
@@ -151,21 +152,24 @@ class Item extends React.Component {
     this.handleSwipeEnd = this.handleSwipeEnd.bind(this)
   }
 
-  calcP(delta) {
-    return ACTION_DELTA - Math.max(0, ACTION_DELTA - delta)
+  calcP(delta, max) {
+    const p = ACTION_DELTA - Math.max(0, ACTION_DELTA - delta)
+    return Math.round(p / ACTION_DELTA * max)
   }
 
   swipingLeft(e, rightPan) {
-    const p = this.calcP(rightPan)
-    const percent = Math.round(p / ACTION_DELTA * 15)
-    // console.log('swiping', p, rightPan, percent)
+    const max = 15
+    const percent = this.calcP(rightPan, max)
+
+    // console.log('swiping', p, this.state.rightPan, rightPan, percent)
     if (this.state.rightPan === percent) return
 
     this.setState({
       leftPan: 0,
       rightPan: percent,
-      removing: ACTION_DELTA === p,
+      removing: percent === max,
       commenting: false,
+      wasActive: this.state.commenting || this.state.wasActive,
     })
     // this.setState({ rightPan: Math.min(150, this.state.rightPan + rightPan) })
   }
@@ -173,8 +177,8 @@ class Item extends React.Component {
   swipingRight(e, leftPan) {
     if (this.state.commenting) return
 
-    const p = this.calcP(leftPan)
-    const percent = Math.round(p / ACTION_DELTA * 15)
+    const max = 15
+    const percent = this.calcP(leftPan, max)
     // console.log('swiping', e, leftPan)
     // this.setState({ rightPan: Math.max(20, this.state.rightPan - leftPan) })
     if (this.state.leftPan === percent) return
@@ -183,14 +187,14 @@ class Item extends React.Component {
       leftPan: percent,
       rightPan: 0,
       removing: false,
-      commenting: ACTION_DELTA === p,
+      commenting: percent === max,
     })
   }
 
   handleSwipeEnd() {
-    // if (this.state.removing) {
-    //   this.props.remove(this.props.pos)
-    // }
+    if (this.state.removing && !this.state.wasActive) {
+      this.props.remove(this.props.pos)
+    }
 
     this.setState({
       rightPan: 0,
@@ -198,6 +202,7 @@ class Item extends React.Component {
       leftPan: 0,
       // commenting: false,
       removing: false,
+      wasActive: false,
     })
   }
 
@@ -235,30 +240,29 @@ class Item extends React.Component {
         onSwipedLeft={this.swipedLeft}*/
         onSwiped={this.handleSwipeEnd}
         preventDefaultTouchmoveEvent
+        className="order" style={orderStylesR}
       >
-        <li className="order" style={orderStylesR}>
-          <div
-            className="comment"
-            style={commentStyles}
-          >
-            <div className="comment-block" style={commentItemStyles}>
-              <input
-                type="text"
-                className="comment-field"
-                style={commentFieldStyles}
-                value={ `comment for ${title}` }
-              />
-            </div>
+        <div
+          className="comment"
+          style={commentStyles}
+        >
+          <div className="comment-block" style={commentItemStyles}>
+            <input
+              type="text"
+              className="comment-field"
+              style={commentFieldStyles}
+              value={ `comment for ${title}` }
+            />
           </div>
-          <div className="order-info" style={itemStyles}>
-            <span className="title" style={titleStyles}>{title}</span>
-            <span className="price">{price}</span>
-          </div>
-          <div
-            className="remove"
-            style={removeStyles}
-          >x</div>
-        </li>
+        </div>
+        <div className="order-info" style={itemStyles}>
+          <span className="title" style={titleStyles}>{title}</span>
+          <span className="price">{price}</span>
+        </div>
+        <div
+          className="remove"
+          style={removeStyles}
+        >x</div>
       </Swipeable>
     )
   }

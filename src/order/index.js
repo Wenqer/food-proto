@@ -34,6 +34,7 @@ const ordersMock = [
 const containerStyles = {
   listStyle: 'none',
   // margin: '10px',
+  overflow: 'hidden',
   margin: 0,
   padding: 0,
   display: 'block',
@@ -60,9 +61,9 @@ class Order extends React.Component {
 
   render() {
     return (
-      <ul style={containerStyles}>
+      <section style={containerStyles}>
         {this.state.orders.map((data, pos) => <Item {...data} remove={this.remove} pos={pos} />)}
-      </ul>
+      </section>
     )
   }
 }
