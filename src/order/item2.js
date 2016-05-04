@@ -13,6 +13,10 @@ import Swipeable from 'react-swipeable'
 const cyan600 = '#00acc1'
 const cyan600T = 'rgba(0, 172, 193, 0.9)'
 const red600 = '#e53935'
+const base = 4
+const basis = 100 / base
+const blockSize = basis - 2
+const removeSize = blockSize / 3
 
 const orderStyles = {
   display: 'flex',
@@ -20,24 +24,29 @@ const orderStyles = {
   // margin: '1px 0',
   margin: 0,
   // lineHeight: '40px',
-  fontSize: '5vw',
-  transform: 'translateX(-17em)',
+  fontSize: `${base}vw`,
+  transform: `translateX(-${blockSize - 1}em)`,
   transitionDuration: '0.3s',
   lineHeight: '4em',
   width: '300%',
   boxSizing: 'border-box',
 }
 
+const block = {
+  boxSizing: 'border-box',
+  width: `${blockSize}em`,
+  padding: '0 .5em',
+}
+
 // & > *
 // width 100%
 
 const infoStyles = {
+  ...block,
   // flex: 'auto',
-  padding: '0 .5em',
   transitionDuration: '0.3s',
   border: '2px solid',
   borderColor: 'transparent',
-  width: '17em',
   alignItems: 'center',
   justifyContent: 'space-between',
   display: 'flex',
@@ -49,7 +58,7 @@ const titleStyles = {
 }
 
 const removingOrderStyles = {
-  transform: 'translateX(-22em)',
+  transform: `translateX(-${blockSize + removeSize - 2}em)`,
 }
 
 const commentingOrderStyles = {
@@ -74,7 +83,7 @@ const commentingInfoStyles = {
 
 const removeStyles = {
   // flex: '1 1 10rem',
-  width: '6em',
+  width: `${removeSize}em`,
   transitionDuration: '0.3s',
   textAlign: 'center',
   backgroundColor: red600,
@@ -88,12 +97,9 @@ const removeStyles = {
 
 const commentStyles = {
   // flex: '1',
+  ...block,
   transitionDuration: '0.3s',
   backgroundColor: cyan600,
-  width: '17em',
-  position: 'relative',
-  padding: '0 .5em',
-  // padding: '0 0 0 10px',
   // overflow: 'hidden',
 }
 
