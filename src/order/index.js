@@ -1,5 +1,5 @@
 import React from 'react'
-import Item from './item'
+import Item from './item2'
 
 document.body.style.margin = 0
 const ordersMock = [
