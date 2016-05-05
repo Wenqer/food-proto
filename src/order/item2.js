@@ -27,7 +27,7 @@ const orderStyles = {
   fontSize: `${base}vw`,
   transform: `translateX(-${blockSize - 1}em)`,
   transitionDuration: '0.3s',
-  lineHeight: '4em',
+  lineHeight: '3em',
   width: '300%',
   boxSizing: 'border-box',
 }
@@ -127,9 +127,17 @@ const commentFieldStyles = {
   lineHeight: '1.1em',
   fontSize: 'inherit',
   width: '100%',
+  overflow: 'hidden',
+  maxHeight: '1em',
   wordBreak: 'break-all',
   textAlign: 'justify',
+  transitionDuration: '.3s',
+  transitionDelay: '.1s',
   // display: 'inline-block',
+}
+
+const commentFieldActiveStyles = {
+  maxHeight: '10em',
 }
 
 const commentBlockStyles = {
@@ -145,9 +153,9 @@ const commentBlockStyles = {
   transitionDuration: '0.3s',
 }
 
-const commentBlockActiveStyles = {
-  left: '0vw',
-}
+// const commentBlockActiveStyles = {
+//   left: '0vw',
+// }
 // &:hover
 //   flex 1 300px
 //   .comment-field
@@ -249,9 +257,14 @@ class Item extends React.Component {
       ...(this.state.commenting ? commentingInfoStyles : {}),
     }
 
-    const commentItemStyles = {
-      ...commentBlockStyles,
-      ...(this.state.commenting ? commentBlockActiveStyles : {}),
+    // const commentItemStyles = {
+    //   ...commentBlockStyles,
+    //   ...(this.state.commenting ? commentBlockActiveStyles : {}),
+    // }
+
+    const commentFieldStylesR = {
+      ...commentFieldStyles,
+      ...(this.state.commenting ? commentFieldActiveStyles : {}),
     }
 // style={{ ...commentStyles, flexBasis: `${this.state.leftPan}%` }}
 // style={{ ...commentStyles, flexBasis: `${'0'}%` }}
@@ -275,13 +288,13 @@ class Item extends React.Component {
           className="comment"
           style={commentStyles}
         >
-          <div className="comment-block" style={commentItemStyles}>
+          <div className="comment-block" style={commentBlockStyles}>
             <small style={commentLabelStyles}>comment</small>
             <div
               ref="comment"
               contentEditable
               className="comment-field"
-              style={commentFieldStyles}
+              style={commentFieldStylesR}
             >
             {`${title} ${title} ${title}`}
             </div>
